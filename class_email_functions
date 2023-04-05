@@ -214,7 +214,7 @@ def send_discount_emails(access_token, event_id_list, template_file_path,Discoun
                 Contact_First_Name = contact_info[1]
                 contact_id = contact_info[2]
                 print(Event_Title)
-                print(Contact_First_Name)
-                print(email)
+                #print(Contact_First_Name)
+                #print(email)
                 filled_template = fill_email_template(Contact_First_Name, Event_Title,Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
