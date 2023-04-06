@@ -122,6 +122,7 @@ def send_email(access_token,body, contact_id,first_name, email):
         ],
     }
 
+
     # Make an API request to send the email
     send_email_response = requests.post(f'{api_base_url}/rpc/{account_id}/email/SendEmail', headers=headers, json=email_data)
     
@@ -199,6 +200,7 @@ def get_past_event_ids(access_token, current_datetime=None):
 
 def send_discount_emails(access_token, event_id_list, template_file_path,Discount_Code):
     html_template = read_template_file(template_file_path)
+    num_emails = 0
     for event_id in event_id_list:
         
         print(event_id)
@@ -209,6 +211,7 @@ def send_discount_emails(access_token, event_id_list, template_file_path,Discoun
             print(f'No attendees found for event {event_id}')
         else:    
             for id in contact_ids:
+                num_emails+=1
                 contact_info = get_contact_info(id, access_token)
                 email = contact_info[0]
                 Contact_First_Name = contact_info[1]
@@ -218,3 +221,4 @@ def send_discount_emails(access_token, event_id_list, template_file_path,Discoun
                 #print(email)
                 filled_template = fill_email_template(Contact_First_Name, Event_Title,Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
+    print(f'Sent {num_emails} emails.')
