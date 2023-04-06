@@ -8,7 +8,7 @@ access_token = get_access_token(api_key)#Gets the access token from the WA API
 
 template_email_file_path = 'class_discount_email_template.html'
 
-test_date = datetime(2023, 12, 30, 0, 1, tzinfo=timezone.utc)#will get removed for "production use"
+#test_date = datetime(2023, 12, 30, 0, 1, tzinfo=timezone.utc)#will get removed for "production use"
 event_id_list = get_past_event_ids(access_token, test_date)
 
 send_discount_emails(access_token, event_id_list, template_email_file_path, Discount_Code)

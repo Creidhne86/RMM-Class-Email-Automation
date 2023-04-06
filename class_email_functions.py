@@ -108,7 +108,7 @@ def send_email(access_token,body, contact_id,first_name, email):
 
     # Prepare email data
     email_data = {
-        "Subject": "TEST - Free Month Promo at Red Mountain Makers!",
+        "Subject": "Free Month Promo at Red Mountain Makers!",
         "Body": body,
         "ReplyToAddress": "secretary@redmountainmakers.org",
         "ReplyToName": "Red Mountain Makers",
