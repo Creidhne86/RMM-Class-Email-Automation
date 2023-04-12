@@ -2,9 +2,7 @@ name: Class Followup Automation
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 17 * * 1-5' # runs every weekday at 12pm CST
-
+  
 jobs:
   my_job:
     runs-on: ubuntu-latest
