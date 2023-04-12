@@ -191,10 +191,12 @@ def get_past_event_ids(access_token, current_datetime=None):
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events', headers=headers)
     events = events_response.json()['Events']
 
-    # Filter events that occurred within the specified time frame, are visible to the public, and do not have "private" in the title
+    # Filter events that occurred within the specified time frame, are visible to the public, and do not have "free" or "awa" in the title
     past_event_ids = [event['Id'] for event in events if event.get('EndDate') is not None and
                       past_datetime <= datetime.fromisoformat(event['EndDate'].replace('Z', '+00:00')) < current_datetime and
-                      event.get('AccessLevel') == 'Public']
+                      event.get('AccessLevel') == 'Public' and
+                      'free' not in event.get('Name', '').lower() and
+                      'awa' not in event.get('Name', '').lower()]
 
     return past_event_ids
 
