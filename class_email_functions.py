@@ -223,7 +223,7 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
 
                 # Skip over members
                 if membership_enabled:
-                    logging.info("This person is already a member!")
+                    logging.info(f"A class attendee for {event_id} is already a member, skipping to the next attendee")
                     continue
                 
                 event_num_emails +=1
@@ -236,5 +236,5 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
                 # print(email)
                 filled_template = fill_email_template(Contact_First_Name, Event_Title, Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
-        logging.info(f"Sent {event_num_emails} for event {event_id}")
+        logging.info(f"Sent {event_num_emails} emails for event {event_id}")
     logging.info(f'Sent {total_num_emails} emails in total.')
