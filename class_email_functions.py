@@ -209,12 +209,12 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
     num_emails = 0
     for event_id in event_id_list:
 
-        print(event_id)
+        logging.info(event_id)
         Event_Title = event_title(event_id, access_token)
         contact_ids = get_event_attendees(event_id, access_token)
 
         if not contact_ids:
-            print(f'No attendees found for event {event_id}')
+            logging.info(f'No attendees found for event {event_id}')
         else:
             for id in contact_ids:
                 contact_info = get_contact_info(id, access_token)
@@ -222,7 +222,7 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
 
                 # Skip over members
                 if membership_enabled:
-                    print("This person is already a member!")
+                    logging.info("This person is already a member!")
                     continue
 
                 num_emails += 1
