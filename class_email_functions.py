@@ -82,11 +82,13 @@ def get_contact_info(contact_id, access_token):
 
     contact_details = contact_response.json()
 
-    # Get the email address and first name from the contact details
+    # Get the email address, first name, and membership status from the contact details
     email = contact_details.get('Email', 'Unknown')
     first_name = contact_details.get('FirstName', 'Unknown')
+    membership_enabled = contact_details.get('MembershipEnabled', False)
 
-    return email, first_name, contact_id
+    return email, first_name, contact_id, membership_enabled
+
 
 def send_email(access_token,body, contact_id,first_name, email):
 
@@ -200,27 +202,34 @@ def get_past_event_ids(access_token, current_datetime=None):
 
     return past_event_ids
 
-def send_discount_emails(access_token, event_id_list, template_file_path,Discount_Code):
+def send_discount_emails(access_token, event_id_list, template_file_path, Discount_Code):
     html_template = read_template_file(template_file_path)
     num_emails = 0
     for event_id in event_id_list:
-        
+
         print(event_id)
         Event_Title = event_title(event_id, access_token)
         contact_ids = get_event_attendees(event_id, access_token)
 
         if not contact_ids:
             print(f'No attendees found for event {event_id}')
-        else:    
+        else:
             for id in contact_ids:
-                num_emails+=1
                 contact_info = get_contact_info(id, access_token)
+                membership_enabled = contact_info[3]
+
+                # Skip over members
+                if membership_enabled:
+                    print("This person is already a member!")
+                    continue
+
+                num_emails += 1
                 email = contact_info[0]
                 Contact_First_Name = contact_info[1]
                 contact_id = contact_info[2]
                 print(Event_Title)
-                #print(Contact_First_Name)
-                #print(email)
-                filled_template = fill_email_template(Contact_First_Name, Event_Title,Discount_Code, html_template)
+                # print(Contact_First_Name)
+                # print(email)
+                filled_template = fill_email_template(Contact_First_Name, Event_Title, Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
     print(f'Sent {num_emails} emails.')
