@@ -80,7 +80,7 @@ def get_contact_info(contact_id, access_token):
     # Make an API request to retrieve the contact details
     contact_response = requests.get(f'{api_base_url}/accounts/{account_id}/contacts/{contact_id}', headers=headers)
     if contact_response.status_code != 200:
-        logging.info(f'Error: Unable to retrieve contact details. Status code: {contact_response.status_code}')
+        logging.error(f'Error: Unable to retrieve contact details. Status code: {contact_response.status_code}')
         return
 
     contact_details = contact_response.json()
@@ -206,16 +206,17 @@ def get_past_event_ids(access_token, current_datetime=None):
 
 def send_discount_emails(access_token, event_id_list, template_file_path, Discount_Code):
     html_template = read_template_file(template_file_path)
-    num_emails = 0
+    total_num_emails = 0
     for event_id in event_id_list:
 
-        logging.info(event_id)
+        #logging.info(event_id)
         Event_Title = event_title(event_id, access_token)
         contact_ids = get_event_attendees(event_id, access_token)
 
         if not contact_ids:
             logging.info(f'No attendees found for event {event_id}')
         else:
+            event_num_emails = 0
             for id in contact_ids:
                 contact_info = get_contact_info(id, access_token)
                 membership_enabled = contact_info[3]
@@ -224,14 +225,16 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
                 if membership_enabled:
                     logging.info("This person is already a member!")
                     continue
-
-                num_emails += 1
+                
+                event_num_emails +=1
+                total_num_emails += 1
                 email = contact_info[0]
                 Contact_First_Name = contact_info[1]
                 contact_id = contact_info[2]
-                logging.info(f" Found past event: {Event_Title}")
+                #logging.info(f" Found past event: {Event_Title}")
                 # print(Contact_First_Name)
                 # print(email)
                 filled_template = fill_email_template(Contact_First_Name, Event_Title, Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
-    logging.info(f'Sent {num_emails} emails.')
+        logging.info(f"Sent {event_num_emails} for event {event_id}")
+    logging.info(f'Sent {total_num_emails} emails in total.')
