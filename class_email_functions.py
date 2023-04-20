@@ -1,6 +1,9 @@
 import base64
+import logging
 import requests
 from datetime import datetime, timezone, timedelta
+
+logging.basicConfig(filename='rmm_email_automation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_access_token(api_key):
     
@@ -36,7 +39,7 @@ def get_event_attendees(event_id, access_token):
     # Make an API request to retrieve the account details
     account_response = requests.get(f'{api_base_url}/accounts', headers=headers)
     if account_response.status_code != 200:
-        print(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
+        logging.error(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
         return
 
     account_id = account_response.json()[0]['Id']
@@ -46,14 +49,14 @@ def get_event_attendees(event_id, access_token):
         f'{api_base_url}/accounts/{account_id}/eventregistrations?eventId={event_id}', headers=headers
     )
     if registrations_response.status_code != 200:
-        print(f'Error: Unable to retrieve event registrations. Status code: {registrations_response.status_code}')
+        logging.error(f'Error: Unable to retrieve event registrations. Status code: {registrations_response.status_code}')
         return
 
     registrations = registrations_response.json()
 
     # Print the individual contact IDs
     contact_ids = [registration['Contact']['Id'] for registration in registrations]
-    #print(f'Contact IDs: {contact_ids}')
+    #logging.info(f'Contact IDs: {contact_ids}')
 
     return contact_ids
 
@@ -69,7 +72,7 @@ def get_contact_info(contact_id, access_token):
     # Make an API request to retrieve the account details
     account_response = requests.get(f'{api_base_url}/accounts', headers=headers)
     if account_response.status_code != 200:
-        print(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
+        logging.error(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
         return
 
     account_id = account_response.json()[0]['Id']
@@ -77,7 +80,7 @@ def get_contact_info(contact_id, access_token):
     # Make an API request to retrieve the contact details
     contact_response = requests.get(f'{api_base_url}/accounts/{account_id}/contacts/{contact_id}', headers=headers)
     if contact_response.status_code != 200:
-        print(f'Error: Unable to retrieve contact details. Status code: {contact_response.status_code}')
+        logging.info(f'Error: Unable to retrieve contact details. Status code: {contact_response.status_code}')
         return
 
     contact_details = contact_response.json()
@@ -88,7 +91,6 @@ def get_contact_info(contact_id, access_token):
     membership_enabled = contact_details.get('MembershipEnabled', False)
 
     return email, first_name, contact_id, membership_enabled
-
 
 def send_email(access_token,body, contact_id,first_name, email):
 
@@ -103,7 +105,7 @@ def send_email(access_token,body, contact_id,first_name, email):
 
     account_response = requests.get(f'{api_base_url}/accounts', headers=headers)
     if account_response.status_code != 200:
-        print(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
+        logging.error(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
         return
 
     account_id = account_response.json()[0]['Id']
@@ -129,7 +131,7 @@ def send_email(access_token,body, contact_id,first_name, email):
     send_email_response = requests.post(f'{api_base_url}/rpc/{account_id}/email/SendEmail', headers=headers, json=email_data)
     
     if send_email_response.status_code != 200:
-        print(f'Error: Unable to send email. Status code: {send_email_response.status_code}')
+        logging.error(f'Error: Unable to send email. Status code: {send_email_response.status_code}')
         return
     
 def fill_email_template(Contact_First_Name, Event_Title,Discount_Code, template):
@@ -151,7 +153,7 @@ def event_title(event_id, access_token):
     # Make an API request to retrieve the account details
     account_response = requests.get(f'{api_base_url}/accounts', headers=headers)
     if account_response.status_code != 200:
-        print(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
+        logging.error(f'Error: Unable to retrieve account details. Status code: {account_response.status_code}')
         return
 
     account_id = account_response.json()[0]['Id']
@@ -159,12 +161,12 @@ def event_title(event_id, access_token):
     # Make an API request to retrieve event details
     event_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events/{event_id}', headers=headers)
     if event_response.status_code != 200:
-        print(f'Error: Unable to retrieve event details. Status code: {event_response.status_code}')
+        logging.error(f'Error: Unable to retrieve event details. Status code: {event_response.status_code}')
         return
 
     event_details = event_response.json()
 
-    # Print the number of checked-in attendees
+    # Return the number of checked-in attendees
     event_name = event_details.get('Name', 'Unknown')
     return event_name
 
@@ -227,9 +229,9 @@ def send_discount_emails(access_token, event_id_list, template_file_path, Discou
                 email = contact_info[0]
                 Contact_First_Name = contact_info[1]
                 contact_id = contact_info[2]
-                print(Event_Title)
+                logging.info(f" Found past event: {Event_Title}")
                 # print(Contact_First_Name)
                 # print(email)
                 filled_template = fill_email_template(Contact_First_Name, Event_Title, Discount_Code, html_template)
                 send_email(access_token, filled_template, contact_id, Contact_First_Name, email)
-    print(f'Sent {num_emails} emails.')
+    logging.info(f'Sent {num_emails} emails.')
