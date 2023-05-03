@@ -196,7 +196,7 @@ def get_past_event_ids(access_token, current_datetime=None):
 
     filter_query = f"StartDate lt '{current_datetime.isoformat()}' and EndDate lt '{current_datetime.isoformat()}' and AccessLevel eq 'Public' and Name ne 'Free' and Name ne 'awa'"
     
-    events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events', headers=headers)
+    events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
     
     print(events_response.text) #troubleshooting actions failure on this line
     
