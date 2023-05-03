@@ -188,28 +188,28 @@ def get_past_event_ids(access_token, current_datetime=None):
     if current_datetime is None:
         current_datetime = datetime.now(timezone.utc)
 
-    # Check if today is Monday
+    # Check if today is Monday, if it's monday check all the events that occurred Friday-Sunday, if not, check the previous day
     hours_to_check = 72 if current_datetime.weekday() == 0 else 24
     past_datetime = current_datetime - timedelta(hours=hours_to_check)
 
-    # Make an API request to retrieve event data
-
+    #Create a filter query to only get a response based on the recently completed events
     filter_query = f"StartDate lt '{past_datetime.strftime('%Y-%m-%d %H:%M:%S')}' and EndDate lt '{current_datetime.strftime('%Y-%m-%d %H:%M:%S')}'" 
+
     # Make an API request to retrieve event data
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
 
+    print(events_response.text)
+    
     # Check if the response status code is OK (200)
     if events_response.status_code != 200:
-        print(f"Error: Received status code {events_response.status_code} from the API.")
-        print(events_response.text)
+        logging.error(f"Error: Received status code {events_response.status_code} from the API.")
         return []
 
     # Try to parse the JSON response and handle potential JSONDecodeError
     try:
         events = events_response.json()['Events']
     except json.JSONDecodeError as e:
-        print(f"Error: Unable to parse JSON response from the API. Error details: {e}")
-        print(events_response.text)
+        logging.error(f"Error: Unable to parse JSON response from the API. Error details: {e}")
         return []
     
     past_event_ids = [event['Id'] for event in events if event.get('EndDate') is not None and
