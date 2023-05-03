@@ -195,7 +195,7 @@ def get_past_event_ids(access_token, current_datetime=None):
     # Make an API request to retrieve event data
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events', headers=headers)
     
-    print(json.dumps(events_response.json(), indent=4)) #troubleshooting actions failure on this line
+    print(events_response.text) #troubleshooting actions failure on this line
     
     events = events_response.json()['Events']
 
