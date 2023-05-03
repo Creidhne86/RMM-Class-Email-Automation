@@ -198,7 +198,7 @@ def get_past_event_ids(access_token, current_datetime=None):
     # Make an API request to retrieve event data
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
 
-    print(events_response.text)
+    #print(events_response.text)
     
     # Check if the response status code is OK (200)
     if events_response.status_code != 200:
