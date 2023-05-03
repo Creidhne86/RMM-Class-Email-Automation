@@ -194,7 +194,7 @@ def get_past_event_ids(access_token, current_datetime=None):
 
     # Make an API request to retrieve event data
 
-    filter_query = f"StartDate lt '{past_datetime.strftime('%Y-%m-%d %H:%M:%S')}' and EndDate lt '{current_datetime.strftime('%Y-%m-%d %H:%M:%S')}' and AccessLevel eq 'Public' and Name ne 'Free' and Name ne 'awa'" 
+    filter_query = f"StartDate lt '{past_datetime.strftime('%Y-%m-%d %H:%M:%S')}' and EndDate lt '{current_datetime.strftime('%Y-%m-%d %H:%M:%S')}'" 
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
     
     print(events_response.text) #troubleshooting actions failure on this line
