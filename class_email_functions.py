@@ -211,6 +211,12 @@ def get_past_event_ids(access_token, current_datetime=None):
         print(f"Error: Unable to parse JSON response from the API. Error details: {e}")
         print(events_response.text)
         return []
+    
+    past_event_ids = [event['Id'] for event in events if event.get('EndDate') is not None and
+                      past_datetime <= datetime.fromisoformat(event['EndDate'].replace('Z', '+00:00')) < current_datetime and
+                      event.get('AccessLevel') == 'Public' and
+                      'free' not in event.get('Name', '').lower() and
+                      'awa' not in event.get('Name', '').lower()]
 
     return past_event_ids
 
