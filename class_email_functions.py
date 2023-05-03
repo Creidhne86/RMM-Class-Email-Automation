@@ -195,11 +195,22 @@ def get_past_event_ids(access_token, current_datetime=None):
     # Make an API request to retrieve event data
 
     filter_query = f"StartDate lt '{past_datetime.strftime('%Y-%m-%d %H:%M:%S')}' and EndDate lt '{current_datetime.strftime('%Y-%m-%d %H:%M:%S')}'" 
+    # Make an API request to retrieve event data
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
-    
-    print(events_response.text) #troubleshooting actions failure on this line
-    
-    events = events_response.json()['Events']
+
+    # Check if the response status code is OK (200)
+    if events_response.status_code != 200:
+        print(f"Error: Received status code {events_response.status_code} from the API.")
+        print(events_response.text)
+        return []
+
+    # Try to parse the JSON response and handle potential JSONDecodeError
+    try:
+        events = events_response.json()['Events']
+    except json.JSONDecodeError as e:
+        print(f"Error: Unable to parse JSON response from the API. Error details: {e}")
+        print(events_response.text)
+        return []
 
     return past_event_ids
 
