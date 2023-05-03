@@ -193,7 +193,7 @@ def get_past_event_ids(access_token, current_datetime=None):
     past_datetime = current_datetime - timedelta(hours=hours_to_check)
 
     #Create a filter query to only get a response based on the recently completed events
-    filter_query = f"StartDate lt {past_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')} and EndDate lt {current_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+    filter_query = f"StartDate gt {past_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')} and EndDate lt {current_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')}"
 
     # Make an API request to retrieve event data
     events_response = requests.get(f'{api_base_url}/accounts/{account_id}/Events?$filter={filter_query}', headers=headers)
